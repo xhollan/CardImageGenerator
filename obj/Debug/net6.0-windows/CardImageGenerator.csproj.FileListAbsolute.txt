@@ -1,0 +1,14 @@
+C:\Users\Stefan Hollan\CascadeProjects\CardImageGenerator\bin\Debug\net6.0-windows\CardImageGenerator.exe
+C:\Users\Stefan Hollan\CascadeProjects\CardImageGenerator\bin\Debug\net6.0-windows\CardImageGenerator.deps.json
+C:\Users\Stefan Hollan\CascadeProjects\CardImageGenerator\bin\Debug\net6.0-windows\CardImageGenerator.runtimeconfig.json
+C:\Users\Stefan Hollan\CascadeProjects\CardImageGenerator\bin\Debug\net6.0-windows\CardImageGenerator.dll
+C:\Users\Stefan Hollan\CascadeProjects\CardImageGenerator\bin\Debug\net6.0-windows\CardImageGenerator.pdb
+C:\Users\Stefan Hollan\CascadeProjects\CardImageGenerator\obj\Debug\net6.0-windows\CardImageGenerator.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Stefan Hollan\CascadeProjects\CardImageGenerator\obj\Debug\net6.0-windows\CardImageGenerator.AssemblyInfoInputs.cache
+C:\Users\Stefan Hollan\CascadeProjects\CardImageGenerator\obj\Debug\net6.0-windows\CardImageGenerator.AssemblyInfo.cs
+C:\Users\Stefan Hollan\CascadeProjects\CardImageGenerator\obj\Debug\net6.0-windows\CardImageGenerator.csproj.CoreCompileInputs.cache
+C:\Users\Stefan Hollan\CascadeProjects\CardImageGenerator\obj\Debug\net6.0-windows\CardImageGenerator.dll
+C:\Users\Stefan Hollan\CascadeProjects\CardImageGenerator\obj\Debug\net6.0-windows\refint\CardImageGenerator.dll
+C:\Users\Stefan Hollan\CascadeProjects\CardImageGenerator\obj\Debug\net6.0-windows\CardImageGenerator.pdb
+C:\Users\Stefan Hollan\CascadeProjects\CardImageGenerator\obj\Debug\net6.0-windows\CardImageGenerator.genruntimeconfig.cache
+C:\Users\Stefan Hollan\CascadeProjects\CardImageGenerator\obj\Debug\net6.0-windows\ref\CardImageGenerator.dll

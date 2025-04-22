@@ -1,0 +1,42 @@
+# Card element box pixel guides for background.png (336x500)
+# You can fine-tune these values as needed for perfect fit.
+
+# Blue cost: (top left)
+blue_x = 14
+blue_y = 14
+
+# Green cost: (top right)
+green_x = 278
+green_y = 14
+
+# Card name: (centered in yellow box)
+name_x = 168
+name_y = 56
+
+# Art image: (main frame)
+art_x = 20
+art_y = 60
+art_w = 296
+art_h = 140
+
+# Abilities: (large blue box)
+abilities_x = 28
+abilities_y = 220
+abilities_w = 280
+abilities_h = 110
+
+# Attack: (bottom leftmost)
+attack_x = 16
+attack_y = 430
+
+# Health: (bottom center-left)
+health_x = 92
+health_y = 430
+
+# Initiative: (bottom right)
+initiative_x = 260
+initiative_y = 430
+
+# Bottom text: (centered in small blue box above bottom row)
+bottom_text_x = 168
+bottom_text_y = 480
