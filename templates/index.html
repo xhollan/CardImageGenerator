@@ -27,9 +27,24 @@
             <label>Time <input type="number" name="time" min="0" max="99" required></label>
             <label>Attack <input type="number" name="attack" min="0" max="99" required></label>
             <label>Health <input type="number" name="health" min="0" max="99" required></label>
+            <label>R <input type="text" name="r" maxlength="1" style="width:40px" required></label>
+            <label>G <input type="text" name="g" maxlength="1" style="width:40px" required></label>
         </div>
         <button class="submit-btn" type="submit">Generate Card</button>
         <button class="submit-btn" type="submit" name="preview" value="1" style="background: #aaa; color: #222; margin-left: 10px;">Preview Card</button>
+        <label style="margin-top:20px;display:block">Import from file (CSV line): <input type="file" id="import_file" name="import_file" accept=".txt,.csv" disabled onchange="this.form.submit()"></label>
+        <script>
+        // Enable import_file input only if a picture is selected
+        const pictureInput = document.querySelector('input[type="file"][name="picture"]');
+        const importInput = document.getElementById('import_file');
+        pictureInput.addEventListener('change', function() {
+            if (pictureInput.files.length > 0) {
+                importInput.disabled = false;
+            } else {
+                importInput.disabled = true;
+            }
+        });
+        </script>
     </form>
 </body>
 </html>

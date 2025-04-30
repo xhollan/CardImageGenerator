@@ -1,40 +1,59 @@
 from flask import Flask, render_template, request, send_file
 from PIL import Image, ImageDraw, ImageFont
 import io
+import csv
 
 app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # Get form fields
-        name = request.form['name']
-        abilities = request.form['abilities']
-        bottom_text = request.form['bottom_text']
-        blue = request.form['blue']
-        green = request.form['green']
-        armor = request.form['armor']
-        time = request.form['time']
-        attack = request.form['attack']
-        health = request.form['health']
-        picture = request.files['picture']
+        import csv
+        # Check for import file
+        import_file = request.files.get('import_file')
+        if import_file and import_file.filename:
+            # Parse first line of CSV
+            line = import_file.read().decode('utf-8').strip().splitlines()[0]
+            reader = csv.reader([line])
+            row = next(reader)
+            # Unpack with defaults
+            (name, cost, time, atk_hp, armor, r, g, origin, reqs, comment) = tuple(list(row) + ['']*max(0,10-len(row)))
+            # Split cost and atk_hp
+            blue, green = (cost.split('/')+[0,0])[:2]
+            attack, health = (atk_hp.split('/')+[0,0])[:2]
+            abilities = f"{origin}\n{reqs}\n{comment}"
+            bottom_text = ''
+            picture = request.files.get('picture')
+        else:
+            # Get form fields
+            name = request.form['name']
+            abilities = request.form['abilities']
+            bottom_text = request.form['bottom_text']
+            blue = request.form['blue']
+            green = request.form['green']
+            armor = request.form['armor']
+            time = request.form['time']
+            attack = request.form['attack']
+            health = request.form['health']
+            r = request.form.get('r','')
+            g = request.form.get('g','')
+            picture = request.files['picture']
+        # If not set (import), try to get r/g from parsed row
+        r = r if 'r' in locals() else ''
+        g = g if 'g' in locals() else ''
 
-        # Load the uploaded image
         # Use new background dimensions
         card_w, card_h = 336, 500
         try:
-            bg = Image.open('background.png').convert('RGBA')
-            bg = bg.resize((card_w, card_h))
+            bg = Image.open('background.png').convert('RGBA').resize((card_w, card_h))
         except Exception as e:
             bg = Image.new('RGBA', (card_w, card_h), (30,30,30,255))
         card = bg.copy()
         draw = ImageDraw.Draw(card)
 
         # Place card art (picture) in the large art frame area (20,60) size 296x140
-        img = Image.open(picture).convert('RGBA')
-        img = img.resize((306, 165))
-        card.paste(img, (15, 100), mask=img)
-
+        img = Image.open(picture).convert('RGBA').resize((260, 150))
+        card.paste(img, (18, 110), mask=img)
 
         # Fonts - use Xolonium-Regular.ttf if available, else Starcraft, else default
         def get_font(size):
@@ -162,6 +181,9 @@ def index():
         draw_outlined_text(draw, (240, 440+25), str(armor), font_stats, (255,255,0,255), (0,0,0,255))
         # Time (bottom far right)
         draw_outlined_text(draw, (290, 75), str(time), font_stats, (120,220,255,255), (0,0,0,255))
+        # R and G
+        draw_outlined_text(draw, (291, 180), r, font_stats, (255,255,255,255), (0,0,0,255))
+        draw_outlined_text(draw, (291, 227), g, font_stats, (255,255,255,255), (0,0,0,255))
 
 
 
