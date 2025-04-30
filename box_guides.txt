@@ -33,9 +33,13 @@ attack_y = 430
 health_x = 92
 health_y = 430
 
-# Initiative: (bottom right)
-initiative_x = 260
-initiative_y = 430
+# Armor: (bottom right)
+armor_x = 260
+armor_y = 430
+
+# Time: (bottom far right)
+time_x = 320
+time_y = 430
 
 # Bottom text: (centered in small blue box above bottom row)
 bottom_text_x = 168

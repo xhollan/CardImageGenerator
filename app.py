@@ -13,7 +13,8 @@ def index():
         bottom_text = request.form['bottom_text']
         blue = request.form['blue']
         green = request.form['green']
-        initiative = request.form['initiative']
+        armor = request.form['armor']
+        time = request.form['time']
         attack = request.form['attack']
         health = request.form['health']
         picture = request.files['picture']
@@ -36,19 +37,38 @@ def index():
 
 
         # Fonts - use Xolonium-Regular.ttf if available, else Starcraft, else default
-        try:
-            font_title = ImageFont.truetype("Xolonium-Regular.ttf", 30)
-            font_abilities = ImageFont.truetype("Xolonium-Regular.ttf", 16)
-            font_stats = ImageFont.truetype("Xolonium-Regular.ttf", 20)
-            font_bottom = ImageFont.truetype("Xolonium-Regular.ttf", 15)
-        except:
+        def get_font(size):
             try:
-                font_title = ImageFont.truetype("Starcraft Normal.ttf", 30)
-                font_abilities = ImageFont.truetype("Starcraft Normal.ttf", 16)
-                font_stats = ImageFont.truetype("Starcraft Normal.ttf", 20)
-                font_bottom = ImageFont.truetype("Starcraft Normal.ttf", 15)
+                return ImageFont.truetype("Xolonium-Regular.ttf", size)
             except:
-                font_title = font_abilities = font_stats = font_bottom = ImageFont.load_default()
+                try:
+                    return ImageFont.truetype("Starcraft Normal.ttf", size)
+                except:
+                    return ImageFont.load_default()
+        font_title = get_font(30)
+        font_abilities = get_font(16)
+        font_stats = get_font(20)
+        font_bottom = get_font(15)
+
+        # Helper: find max font size to fit text in box
+        def fit_text(text, box_w, box_h, max_font_size, min_font_size=8, multiline=False, max_lines=1):
+            for size in range(max_font_size, min_font_size-1, -1):
+                font = get_font(size)
+                if multiline:
+                    lines = text.split('\n')[:max_lines]
+                    heights = [font.getbbox(line)[3] - font.getbbox(line)[1] for line in lines]
+                    total_h = sum(heights)
+                    max_w = max([font.getlength(line) for line in lines] + [1])
+                    if total_h <= box_h and max_w <= box_w:
+                        return font, size
+                else:
+                    bbox = font.getbbox(text)
+                    w = bbox[2] - bbox[0]
+                    h = bbox[3] - bbox[1]
+                    if w <= box_w and h <= box_h:
+                        return font, size
+            return get_font(min_font_size), min_font_size
+
 
         # Helper to draw outlined text
         def draw_outlined_text(draw, pos, text, font, fill, outline_color, anchor="mm"):
@@ -60,29 +80,89 @@ def index():
                         draw.text((x+dx, y+dy), text, font=font, fill=outline_color, anchor=anchor)
             draw.text((x, y), text, font=font, fill=fill, anchor=anchor)
 
+        # Word wrap helper (moved up so it's available for name, abilities, bottom text)
+        def wrap_text(text, font, max_width):
+            lines = []
+            for paragraph in text.split('\n'):
+                words = paragraph.split()
+                if not words:
+                    lines.append('')
+                    continue
+                line = words[0]
+                for word in words[1:]:
+                    test_line = f"{line} {word}"
+                    if font.getlength(test_line) <= max_width:
+                        line = test_line
+                    else:
+                        lines.append(line)
+                        line = word
+                lines.append(line)
+            return lines
+
         # Blue cost (5px up)
         draw_outlined_text(draw, (37, 27), str(blue), font_stats, (0,180,255,255), (0,0,0,255))
-        # Name (fixed coordinate)
-        draw_outlined_text(draw, (150, 27), name, font_title, (255,255,255,255), (0,0,0,255))
+        # Name (fixed box, with word wrap)
+        name_x, name_y = 168, 30  # Center of name box
+        name_box_w, name_box_h = 170, 38
+        font_name, _ = fit_text(name, name_box_w, name_box_h, 34, 12)
+        name_lines = wrap_text(name, font_name, name_box_w)
+        name_line_height = font_name.getbbox('Ag')[3] - font_name.getbbox('Ag')[1]
+        total_name_height = len(name_lines) * name_line_height
+        name_start_y = name_y - total_name_height // 2 + name_line_height // 2
+        for i, line in enumerate(name_lines):
+            draw_outlined_text(draw, (name_x, name_start_y + i * name_line_height), line, font_name, (255,255,255,255), (0,0,0,255))
         # Green cost (5px up)
         draw_outlined_text(draw, (292, 27), str(green), font_stats, (0,255,80,255), (0,0,0,255))
 
-        # Abilities (left-aligned, multiline, at 10,320)
-        abilities_fixed = abilities.replace('\r\n', '\n').replace('\r', '\n')
-        ab_x, ab_y = 10, 320
-        max_lines = 5
-        for i, line in enumerate(abilities_fixed.split('\n')[:max_lines]):
-            draw_outlined_text(draw, (ab_x, ab_y + i*22), line[:40], font_abilities, (220,255,255,255), (0,0,0,255), anchor="la")
+        # Word wrap helper for abilities
+        def wrap_text(text, font, max_width):
+            lines = []
+            for paragraph in text.split('\n'):
+                words = paragraph.split()
+                if not words:
+                    lines.append('')
+                    continue
+                line = words[0]
+                for word in words[1:]:
+                    test_line = f"{line} {word}"
+                    if font.getlength(test_line) <= max_width:
+                        line = test_line
+                    else:
+                        lines.append(line)
+                        line = word
+                lines.append(line)
+            return lines
+
+        # Abilities (fixed box, with word wrap)
+        ab_x, ab_y = 20, 320
+        ab_box_w, ab_box_h = 270, 110
+        max_lines = 15
+        font_ab, _ = fit_text(abilities, ab_box_w, ab_box_h, 20, 10, multiline=True, max_lines=max_lines)
+        lines = wrap_text(abilities, font_ab, ab_box_w)[:max_lines]
+        line_height = font_ab.getbbox('Ag')[3] - font_ab.getbbox('Ag')[1]
+        for i, line in enumerate(lines):
+            draw_outlined_text(draw, (ab_x, ab_y + i*line_height), line, font_ab, (220,255,255,255), (0,0,0,255), anchor="la")
+
+        # Bottom text (fixed box, with word wrap)
+        bottom_text_x, bottom_text_y = 140, 460
+        bottom_box_w, bottom_box_h = 130, 50
+        font_bot, _ = fit_text(bottom_text, bottom_box_w, bottom_box_h, 18, 8)
+        bot_lines = wrap_text(bottom_text, font_bot, bottom_box_w)
+        bot_line_height = font_bot.getbbox('Ag')[3] - font_bot.getbbox('Ag')[1]
+        total_bot_height = len(bot_lines) * bot_line_height
+        bot_start_y = bottom_text_y - total_bot_height // 2 + bot_line_height // 2
+        for i, line in enumerate(bot_lines):
+            draw_outlined_text(draw, (bottom_text_x, bot_start_y + i * bot_line_height), line, font_bot, (180,220,255,255), (0,0,0,255))
 
         # Attack
         draw_outlined_text(draw, (10+25, 440+25), str(attack), font_stats, (255,100,60,255), (0,0,0,255))
         # Health
-        draw_outlined_text(draw, (75+25, 440+25), str(health), font_stats, (255,60,120,255), (0,0,0,255))
-        # Initiative
-        draw_outlined_text(draw, (275+25, 440+25), str(initiative), font_stats, (255,255,0,255), (0,0,0,255))
+        draw_outlined_text(draw, (305, 440+25), str(health), font_stats, (255,60,120,255), (0,0,0,255))
+        # Armor
+        draw_outlined_text(draw, (240, 440+25), str(armor), font_stats, (255,255,0,255), (0,0,0,255))
+        # Time (bottom far right)
+        draw_outlined_text(draw, (290, 75), str(time), font_stats, (120,220,255,255), (0,0,0,255))
 
-        # Bottom text (fixed coordinate)
-        draw_outlined_text(draw, (190, 470), bottom_text, font_bottom, (180,220,255,255), (0,0,0,255))
 
 
         # Output image
