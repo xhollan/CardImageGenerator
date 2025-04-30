@@ -16,6 +16,12 @@
 <body>
     <form class="card-form" action="/" method="post" enctype="multipart/form-data">
         <h2>Create Your Card</h2>
+        <div class="form-row">
+            <label style="margin-right:20px; font-weight:bold;">Card type:
+                <input type="radio" name="card_type" value="unit" checked> Unit
+                <input type="radio" name="card_type" value="building"> Building
+            </label>
+        </div>
         <label>Card Picture <input type="file" name="picture" accept="image/*" required></label>
         <label>Card Name <input type="text" name="name" maxlength="30" required></label>
         <label>Abilities <textarea name="abilities" rows="5" maxlength="300" required></textarea></label>
@@ -27,9 +33,35 @@
             <label>Time <input type="number" name="time" min="0" max="99" required></label>
             <label>Attack <input type="number" name="attack" min="0" max="99" required></label>
             <label>Health <input type="number" name="health" min="0" max="99" required></label>
-            <label>R <input type="text" name="r" maxlength="1" style="width:40px" required></label>
-            <label>G <input type="text" name="g" maxlength="1" style="width:40px" required></label>
+            <div id="unit-fields">
+                <label>Speed <input type="text" name="speed" maxlength="8" style="width:50px"></label>
+                <label>R (Ranged/Melee) <input type="text" name="r" maxlength="1" style="width:30px"></label>
+                <label>G (Ground/Flying) <input type="text" name="g" maxlength="1" style="width:30px"></label>
+            </div>
         </div>
+        <script>
+        // Show/hide R/G fields based on card type and clear their values for buildings
+        function updateUnitFields() {
+            const unitFields = document.getElementById('unit-fields');
+            const cardType = document.querySelector('input[name="card_type"]:checked').value;
+            unitFields.style.display = (cardType === 'unit') ? '' : 'none';
+            // Disable and clear Speed/R/G for building
+            document.querySelectorAll('#unit-fields input').forEach(input => {
+                if (cardType === 'unit') {
+                    input.disabled = false;
+                } else {
+                    input.disabled = true;
+                    input.value = '';
+                }
+            });
+        }
+        document.querySelectorAll('input[name="card_type"]').forEach(radio => {
+            radio.addEventListener('change', updateUnitFields);
+        });
+        window.addEventListener('DOMContentLoaded', updateUnitFields);
+        // Ensure updateUnitFields runs before submit
+        document.querySelector('.card-form').addEventListener('submit', updateUnitFields);
+        </script>
         <button class="submit-btn" type="submit">Generate Card</button>
         <button class="submit-btn" type="submit" name="preview" value="1" style="background: #aaa; color: #222; margin-left: 10px;">Preview Card</button>
         <label style="margin-top:20px;display:block">Import from file (CSV line): <input type="file" id="import_file" name="import_file" accept=".txt,.csv" disabled onchange="this.form.submit()"></label>
