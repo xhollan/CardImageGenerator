@@ -148,7 +148,7 @@ def index():
                 bg = Image.open(bg_path).convert('RGBA').resize((card_w, card_h))
             except Exception as e:
                 raise RuntimeError(f"Building background image not found at {bg_path}: {e}")
-            art_w = 280
+            art_w = 325  # Only stretch the imported image 30px wider
             art_x = 8
         else:
             try:
